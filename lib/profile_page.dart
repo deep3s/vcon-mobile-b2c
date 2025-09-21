@@ -19,32 +19,43 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
+            // AppBar section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Row(
                 children: [
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.arrow_back),
+                    child: Icon(Icons.arrow_back, color: colorScheme.onBackground),
                   ),
                   const SizedBox(width: 16),
-                  const Text("My profile", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                  Text(
+                    "My profile",
+                    style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                  ),
                 ],
               ),
             ),
+
+            // Content section
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
+                    // Profile Card
                     Card(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       elevation: 2,
+                      color: colorScheme.surface,
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Column(
@@ -56,24 +67,32 @@ class _ProfilePageState extends State<ProfilePage> {
                                 onPressed: () {
                                   setState(() => isEditing = !isEditing);
                                 },
-                                child: Text(isEditing ? "Save" : "Edit",
-                                    style: const TextStyle(fontSize: 16, color: Colors.deepPurple, fontWeight: FontWeight.w500)),
+                                child: Text(
+                                  isEditing ? "Save" : "Edit",
+                                  style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500, color: colorScheme.primary),
+                                ),
                               ),
                             ),
                             CircleAvatar(
                               radius: 45,
-                              backgroundColor: Colors.deepPurple.shade50,
+                              backgroundColor: colorScheme.secondaryContainer,
                               child: Text(
-                                "${firstNameController.text.isNotEmpty ? firstNameController.text[0] : ''}${lastNameController.text.isNotEmpty ? lastNameController.text[0] : ''}".toUpperCase(),
-                                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                                "${firstNameController.text[0]}${lastNameController.text[0]}".toUpperCase(),
+                                style: textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.onSecondaryContainer,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 12),
-                            Text("${firstNameController.text} ${lastNameController.text}", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                            Text(
+                              "${firstNameController.text} ${lastNameController.text}",
+                              style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                            ),
                             const SizedBox(height: 24),
                             const Divider(),
                             const SizedBox(height: 10),
-                            isEditing ? _buildEditableForm() : _buildReadOnlyInfo(),
+                            isEditing ? _buildEditableForm(context) : _buildReadOnlyInfo(context),
                           ],
                         ),
                       ),
@@ -81,32 +100,33 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     const SizedBox(height: 24),
 
+                    // Address Section
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "My addresses",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 16),
-                        _addressTile(Icons.home, "Home", "Add a home address"),
+                        _addressTile(Icons.home, "Home", "Add a home address", context),
                         const SizedBox(height: 12),
-                        _addressTile(Icons.work_outline, "Work", "Add a work address"),
+                        _addressTile(Icons.work_outline, "Work", "Add a work address", context),
                         const SizedBox(height: 20),
                         OutlinedButton.icon(
                           onPressed: () {},
                           icon: const Icon(Icons.add),
                           label: const Text("Add"),
                           style: OutlinedButton.styleFrom(
+                            foregroundColor: colorScheme.primary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            side: const BorderSide(color: Colors.black12),
+                            side: BorderSide(color: colorScheme.primary.withOpacity(0.3)),
                           ),
                         ),
                       ],
                     ),
-
                   ],
                 ),
               ),
@@ -117,9 +137,13 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _addressTile(IconData icon, String title, String subtitle) {
+  // Address Card
+  Widget _addressTile(IconData icon, String title, String subtitle, BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Material(
-      color: Colors.white,
+      color: Theme.of(context).cardColor,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -129,16 +153,16 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Row(
             children: [
               CircleAvatar(
-                backgroundColor: Colors.grey.shade100,
-                child: Icon(icon, color: Colors.grey.shade700),
+                backgroundColor: colorScheme.surfaceVariant,
+                child: Icon(icon, color: colorScheme.onSurfaceVariant),
               ),
               const SizedBox(width: 16),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                  Text(title, style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500)),
                   const SizedBox(height: 4),
-                  Text(subtitle, style: TextStyle(color: Colors.grey.shade600, fontSize: 14)),
+                  Text(subtitle, style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurface.withOpacity(0.6))),
                 ],
               ),
             ],
@@ -148,7 +172,11 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildEditableForm() {
+  // Editable Form
+  Widget _buildEditableForm(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         _buildTextField("First name", firstNameController),
@@ -164,25 +192,31 @@ class _ProfilePageState extends State<ProfilePage> {
             DropdownMenuItem(value: "Other", child: Text("Other")),
           ],
           onChanged: (value) => setState(() => gender = value ?? ""),
-          decoration: const InputDecoration(labelText: "Gender"),
+          decoration: const InputDecoration(labelText: "Gender", border: OutlineInputBorder()),
         ),
       ],
     );
   }
 
+  // Text Input
   Widget _buildTextField(String label, TextEditingController controller, {TextInputType? keyboardType, String? hint}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
-        decoration: InputDecoration(labelText: label, hintText: hint, border: const OutlineInputBorder()),
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hint,
+          border: const OutlineInputBorder(),
+        ),
         onChanged: (_) => setState(() {}),
       ),
     );
   }
 
-  Widget _buildReadOnlyInfo() {
+  // Read-Only Display
+  Widget _buildReadOnlyInfo(BuildContext context) {
     return Column(
       children: [
         ProfileInfo(title: "First name", value: firstNameController.text),
@@ -196,13 +230,18 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
+// Info Row
 class ProfileInfo extends StatelessWidget {
   final String title;
   final String value;
+
   const ProfileInfo({super.key, required this.title, required this.value});
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -210,11 +249,22 @@ class ProfileInfo extends StatelessWidget {
         children: [
           SizedBox(
             width: 120,
-            child: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black87)),
+            child: Text(
+              title,
+              style: textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: colorScheme.onSurface,
+              ),
+            ),
           ),
           Expanded(
-            child: Text(value, style: TextStyle(fontSize: 14, color: value == "—" ? Colors.grey : Colors.black87)),
-          )
+            child: Text(
+              value,
+              style: textTheme.bodyMedium?.copyWith(
+                color: value == "—" ? colorScheme.onSurface.withOpacity(0.5) : colorScheme.onSurface,
+              ),
+            ),
+          ),
         ],
       ),
     );

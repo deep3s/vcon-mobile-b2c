@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class TagScroller extends StatelessWidget {
   final List<String> tags;
   final String selectedTag;
-  final Function(String) onTagSelected;
+  final ValueChanged<String> onTagSelected;
 
   const TagScroller({
     super.key,
@@ -15,34 +14,38 @@ class TagScroller extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return SizedBox(
       height: 40,
-      child: ListView.builder(
+      child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: tags.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final tag = tags[index];
           final isSelected = tag == selectedTag;
 
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: Text(
-                tag,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                ),
+          return ChoiceChip(
+            label: Text(
+              tag,
+              style: textTheme.bodyMedium?.copyWith(
+                color: isSelected
+                    ? colorScheme.onPrimary
+                    : colorScheme.onSurface,
               ),
-              selected: isSelected,
-              onSelected: (_) => onTagSelected(tag),
-              selectedColor: Colors.black,
-              backgroundColor: Colors.grey.shade200,
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+            ),
+            selected: isSelected,
+            onSelected: (_) => onTagSelected(tag),
+            selectedColor: colorScheme.primary,
+            backgroundColor: colorScheme.surfaceVariant,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(
+                color: isSelected
+                    ? colorScheme.primary
+                    : colorScheme.outlineVariant,
               ),
             ),
           );

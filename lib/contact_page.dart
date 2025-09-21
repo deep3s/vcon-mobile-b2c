@@ -7,14 +7,17 @@ class ContactPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text("My Profile"),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         centerTitle: true,
-        foregroundColor: Colors.black,
+        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -24,7 +27,7 @@ class ContactPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: const [
                   BoxShadow(
@@ -38,35 +41,35 @@ class ContactPage extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 35,
-                    backgroundColor: Colors.deepPurple.shade100,
-                    child: const Text(
+                    backgroundColor: colorScheme.secondaryContainer,
+                    child: Text(
                       "JM",
-                      style: TextStyle(
-                        fontSize: 24,
+                      style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
+                        fontSize: 24,
+                        color: colorScheme.onSecondaryContainer,
                       ),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         "Joshna M",
-                        style: TextStyle(
+                        style: textTheme.titleMedium?.copyWith(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurface,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         "Personal Profile",
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurface.withOpacity(0.6),
                         ),
-                      )
+                      ),
                     ],
                   )
                 ],
@@ -75,37 +78,41 @@ class ContactPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // Wallet
+            // Wallet Card
             Container(
               padding: const EdgeInsets.all(20),
               width: double.infinity,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+                gradient: LinearGradient(
+                  colors: [
+                    colorScheme.primaryContainer,
+                    colorScheme.secondaryContainer,
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Wallet Balance",
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "₹0.00",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 8),
+                  Text(
+                    "₹0.00",
+                    style: textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   Text(
                     "View Wallet",
-                    style: TextStyle(
-                      color: Colors.white,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
                       decoration: TextDecoration.underline,
                     ),
                   ),
@@ -115,27 +122,37 @@ class ContactPage extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            // Menu Items with context
+            // Menu Items
             ..._menuItems.map((item) => _buildTile(item, context)).toList(),
 
             const SizedBox(height: 30),
-            const Text(
-                "App version 1.0.0", style: TextStyle(color: Colors.grey)),
+
+            Text(
+              "App version 1.0.0",
+              style: textTheme.bodySmall?.copyWith(color: colorScheme.primary),
+            ),
           ],
         ),
       ),
     );
   }
 
-  // Modified _buildTile with context and navigation
+  // Menu Tile Builder
   Widget _buildTile(Map<String, dynamic> item, BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Card(
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.symmetric(vertical: 6),
+      color: Theme.of(context).cardColor,
       child: ListTile(
-        leading: Icon(item["icon"], color: Colors.deepPurple),
-        title: Text(item["title"], style: const TextStyle(fontSize: 16)),
+        leading: Icon(item["icon"], color: colorScheme.primary),
+        title: Text(
+          item["title"],
+          style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
+        ),
         trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
         onTap: () {
           if (item["title"] == "Profile") {
@@ -149,20 +166,20 @@ class ContactPage extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const SettingsPage()),
             );
           }
-          // Add more pages for other titles if needed
+          // Extend this if you add other navigations
         },
       ),
     );
   }
 }
 
-// Menu Items
-  final List<Map<String, dynamic>> _menuItems = [
-    {"title": "Profile", "icon": Icons.person_outline},
-    {"title": "Favourites", "icon": Icons.favorite_border},
-    {"title": "Forms", "icon": Icons.insert_drive_file_outlined},
-    {"title": "Product Orders", "icon": Icons.shopping_bag_outlined},
-    {"title": "Settings", "icon": Icons.settings_outlined},
-    {"title": "Support", "icon": Icons.support_agent_outlined},
-    {"title": "Language", "icon": Icons.language},
-  ];
+// Static Menu Items
+final List<Map<String, dynamic>> _menuItems = [
+  {"title": "Profile", "icon": Icons.person_outline},
+  {"title": "Favourites", "icon": Icons.favorite_border},
+  {"title": "Forms", "icon": Icons.insert_drive_file_outlined},
+  {"title": "Product Orders", "icon": Icons.shopping_bag_outlined},
+  {"title": "Settings", "icon": Icons.settings_outlined},
+  {"title": "Support", "icon": Icons.support_agent_outlined},
+  {"title": "Language", "icon": Icons.language},
+];

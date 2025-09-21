@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class VcutUnisexHulimavu extends StatefulWidget {
   const VcutUnisexHulimavu({super.key});
@@ -7,166 +8,227 @@ class VcutUnisexHulimavu extends StatefulWidget {
   State<VcutUnisexHulimavu> createState() => _VcutUnisexHulimavuState();
 }
 
-class _VcutUnisexHulimavuState extends State<VcutUnisexHulimavu> {
-  bool isFavorite = false;
-  int currentIndex = 0;
+class _VcutUnisexHulimavuState extends State<VcutUnisexHulimavu> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
 
-  final List<String> images = [
-    'https://media.istockphoto.com/id/1856117770/photo/modern-beauty-salon.jpg?s=612x612&w=0&k=20&c=dVZtsePk2pgbqDXwVkMm-yIw5imnZ2rnkAruR7zf8EA=',
-    'https://www.w3schools.com/w3images/fjords.jpg',
+  final List<Map<String, String>> services = const [
+    {'name': 'Any 1 Threading', 'duration': '10 mins', 'price': '₹79.20'},
+    {'name': 'Hair Cut', 'duration': '30-40 mins', 'price': '₹319.20'},
+    {'name': 'Hair Treatments', 'duration': '3 hrs', 'price': '₹4,999'},
+    {'name': 'Brazilian Wax', 'duration': '10-30 mins', 'price': '₹119.20'},
   ];
 
-  final List<Map<String, dynamic>> services = [
-    {'name': 'Haircut + Hair Spa', 'duration': '1 hr', 'price': '₹800', 'discount': '20%'},
-    {'name': 'Facial Treatment', 'duration': '45 mins', 'price': '₹1,200', 'discount': '30%'},
-    {'name': 'Manicure & Pedicure', 'duration': '1.5 hrs', 'price': '₹1,500', 'discount': '15%'},
-  ];
-
-  final List<Map<String, String>> team = [
-    {'name': 'Anjali', 'speciality': 'Hair Stylist'},
-    {'name': 'Divya', 'speciality': 'Beauty Therapist'},
-  ];
-
-  final List<Map<String, String>> timings = [
-    {'day': 'Monday', 'from': '09:00 AM', 'to': '10:00 PM'},
-    {'day': 'Tuesday', 'from': '09:00 AM', 'to': '10:00 PM'},
-    {'day': 'Wednesday', 'from': '09:00 AM', 'to': '10:00 PM'},
-    {'day': 'Thursday', 'from': '09:00 AM', 'to': '10:00 PM'},
-    {'day': 'Friday', 'from': '09:00 AM', 'to': '10:00 PM'},
-    {'day': 'Saturday', 'from': '09:00 AM', 'to': '10:00 PM'},
-    {'day': 'Sunday', 'from': '09:00 AM', 'to': '10:00 PM'},
-  ];
-
-  final List<Map<String, dynamic>> venuesNearby = [
+  final List<Map<String, String>> reviews = const [
     {
-      'image': 'https://www.w3schools.com/w3images/fjords.jpg',
-      'name': 'Vcut JP Nagar',
-      'reviews': ['Clean space', 'Friendly staff'],
+      'name': 'Neha Sharma',
+      'rating': '5',
+      'comment': 'Amazing service! The staff was friendly and professional.',
+      'date': '28 July 2025'
     },
     {
-      'image': 'https://www.w3schools.com/w3images/fjords.jpg',
-      'name': "Vcut Bannerghatta",
-      'reviews': ['Neat environment', 'Affordable rates'],
+      'name': 'Ravi Kumar',
+      'rating': '4',
+      'comment': 'Haircut was neat and clean. Ambience was good.',
+      'date': '25 July 2025'
+    },
+    {
+      'name': 'Ayesha',
+      'rating': '5',
+      'comment': 'Loved the waxing service. Very hygienic and quick!',
+      'date': '20 July 2025'
     },
   ];
 
-  final List<Map<String, String>> locations = [
-    {'name': 'Branch A', 'address': 'Lake View Road', 'image': 'assets/location1.jpg'},
-    {'name': 'Branch B', 'address': 'Gurukrupa Layout', 'image': 'assets/location2.jpg'},
-    {'name': 'Branch C', 'address': 'BTM Layout', 'image': 'assets/location3.jpg'},
-    {'name': 'Branch D', 'address': 'JP Nagar', 'image': 'assets/location4.jpg'},
-    {'name': 'Branch E', 'address': 'HSR Layout', 'image': 'assets/location5.jpg'},
-    {'name': 'Branch F', 'address': 'Electronic City', 'image': 'assets/location6.jpg'},
-  ];
-
-  List<Map<String, String>> get visibleLocations {
-    int endIndex = currentIndex + 5;
-    if (endIndex > locations.length) {
-      endIndex = locations.length;
-    }
-    return locations.sublist(currentIndex, endIndex);
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
   }
 
-  void moveLeft() {
-    if (currentIndex > 0) {
-      setState(() => currentIndex--);
-    }
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
-  void moveRight() {
-    if (currentIndex < locations.length - 1) {
-      setState(() => currentIndex++);
-    }
+  Widget _buildServiceTab() {
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: services.length,
+      separatorBuilder: (_, __) => Divider(height: 32, color: Theme.of(context).dividerColor),
+      itemBuilder: (context, index) {
+        final service = services[index];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    service['name']!,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                    side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                  ),
+                  child: Text("Book", style: Theme.of(context).textTheme.labelLarge),
+                ),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Text(
+              service['duration']!,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[700]),
+            ),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.only(left: 2),
+              child: Text(
+                "from ${service['price']!}",
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildReviewTab() {
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: reviews.length,
+      separatorBuilder: (_, __) => Divider(height: 24, color: Theme.of(context).dividerColor),
+      itemBuilder: (context, index) {
+        final review = reviews[index];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.account_circle, size: 32, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(review['name']!, style: Theme.of(context).textTheme.titleSmall),
+                    Text(
+                      review['date']!,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: List.generate(
+                5,
+                    (i) => Icon(
+                  i < int.parse(review['rating']!) ? Icons.star : Icons.star_border,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(review['comment']!, style: Theme.of(context).textTheme.bodyMedium),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildAboutTab() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ListView(
+        children: [
+          Text("About Us", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Text(
+            "V-Cut Unisex Salon in Hulimavu offers premium services in hair, skin, and wellness with a customer-first approach.",
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 16),
+          Text("Opening Hours",
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Text("Mon–Sun: 10 AM – 8 PM", style: Theme.of(context).textTheme.bodyMedium),
+          const SizedBox(height: 16),
+          Text("Additional Information",
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Text(
+            "Walk-ins welcome • Online bookings available • Unisex services",
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('V-Cut Unisex Hulimavu'),
-        actions: [
-          IconButton(
-            icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
-            onPressed: () => setState(() => isFavorite = !isFavorite),
-          ),
+        title: Text(
+          'V-Cut Unisex Salon HSR',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+        ),
+        leading: const BackButton(),
+        actions: const [
+          Icon(Icons.share_outlined),
+          SizedBox(width: 16),
+          Icon(Icons.favorite_border),
+          SizedBox(width: 16),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: colorScheme.primary,
+          labelColor: colorScheme.onSurface,
+          unselectedLabelColor: colorScheme.onSurfaceVariant,
+          labelStyle: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w500),
+          tabs: const [
+            Tab(text: "Services"),
+            Tab(text: "Reviews"),
+            Tab(text: "About"),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildServiceTab(),
+          _buildReviewTab(),
+          _buildAboutTab(),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          SizedBox(
-            height: 200,
-            child: PageView(
-              children: images
-                  .map((url) => ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(url, fit: BoxFit.cover),
-              ))
-                  .toList(),
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Text('Available Services', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          ...services.map((service) => ListTile(
-            title: Text(service['name']),
-            subtitle: Text('${service['duration']} • ${service['price']}'),
-            trailing: Text('${service['discount']} OFF', style: const TextStyle(color: Colors.green)),
-          )),
-          const Divider(),
-          const Text('Our Team', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          ...team.map((member) => ListTile(
-            leading: const Icon(Icons.person),
-            title: Text(member['name']!),
-            subtitle: Text(member['speciality']!),
-          )),
-          const Divider(),
-          const Text('Opening Hours', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          ...timings.map((time) => ListTile(
-            title: Text(time['day']!),
-            trailing: Text('${time['from']} - ${time['to']}'),
-          )),
-          const Divider(),
-          const Text('Venues Nearby', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          ...venuesNearby.map((venue) => ListTile(
-            leading: Image.network(venue['image'], width: 60, height: 60, fit: BoxFit.cover),
-            title: Text(venue['name']),
-            subtitle: Text(venue['reviews'].join(', ')),
-          )),
-          const Divider(),
-          const Text('Nearby Locations', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(onPressed: moveLeft, icon: const Icon(Icons.arrow_back_ios)),
-              Expanded(
-                child: SizedBox(
-                  height: 100,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: visibleLocations.length,
-                    itemBuilder: (context, index) {
-                      final loc = visibleLocations[index];
-                      return Container(
-                        width: 140,
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: Image.asset(loc['image']!, fit: BoxFit.cover),
-                            ),
-                            Text(loc['name']!, style: const TextStyle(fontSize: 12)),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: [
+            Text("182 services available",
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[700])),
+            const Spacer(),
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
-              IconButton(onPressed: moveRight, icon: const Icon(Icons.arrow_forward_ios)),
-            ],
-          )
-        ],
+              child: Text("Book now", style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.white)),
+            )
+          ],
+        ),
       ),
     );
   }

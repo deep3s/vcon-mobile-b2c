@@ -1,53 +1,97 @@
 import 'package:flutter/material.dart';
 
 class SalonCard extends StatelessWidget {
-  final String title;
-  final double rating;
-  final int reviews;
+  final String name;
   final String location;
-  final String image;
+  final double rating;
+  final String imageUrl;
+  final VoidCallback onTap;
 
   const SalonCard({
-    Key? key,
-    required this.title,
-    required this.rating,
-    required this.reviews,
+    super.key,
+    required this.name,
     required this.location,
-    required this.image,
-  }) : super(key: key);
+    required this.rating,
+    required this.imageUrl,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            child: Image.asset(image, height: 150, width: double.infinity, fit: BoxFit.cover),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(Icons.star, color: Colors.orange, size: 16),
-                    const SizedBox(width: 4),
-                    Text("$rating ($reviews)", style: const TextStyle(fontSize: 14)),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(location, style: TextStyle(fontSize: 13, color: Colors.grey[700])),
-              ],
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.shadow.withOpacity(0.05),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
-          )
-        ],
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
+              child: imageUrl.startsWith('http')
+                  ? Image.network(
+                      imageUrl,
+                      height: 120,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.broken_image, size: 80),
+                    )
+                  : Image.asset(
+                      imageUrl,
+                      height: 120,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: textTheme.titleMedium
+                        ?.copyWith(color: colorScheme.onSurface),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    location,
+                    style: textTheme.bodySmall
+                        ?.copyWith(color: colorScheme.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.star, color: colorScheme.primary, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$rating',
+                        style: textTheme.bodySmall
+                            ?.copyWith(color: colorScheme.onSurface),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

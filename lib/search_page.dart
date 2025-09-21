@@ -1,225 +1,126 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:world_time_app/landing_page/salon_card.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'location_service.dart';
 
-class NearbySalonsPage extends StatefulWidget {
-  const NearbySalonsPage({Key? key}) : super(key: key);
+class SearchPage extends StatefulWidget {
+  const SearchPage({super.key});
 
   @override
-  _NearbySalonsPageState createState() => _NearbySalonsPageState();
+  State<SearchPage> createState() => _SearchPageState();
 }
 
-class _NearbySalonsPageState extends State<NearbySalonsPage> {
-  late GoogleMapController mapController;
+class _SearchPageState extends State<SearchPage> {
+  final TextEditingController _controller = TextEditingController();
+  final LocationService _locationService = LocationService();
 
-  final LatLng _center = const LatLng(12.8952, 77.6140); // Akshayanagar
+  List<String> _allLocations = [];
+  List<String> _filteredLocations = [];
+  bool _isLoading = true;
 
-  // Filter state variables
-  String _selectedSort = 'recommended';
-  String _selectedPrice = 'low_to_high';
-  String _selectedType = 'unisex';
+  @override
+  void initState() {
+    super.initState();
+    _loadLocations();
+  }
 
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
+  Future<void> _loadLocations() async {
+    final locations = await _locationService.fetchLocations();
+    setState(() {
+      _allLocations = locations;
+      _filteredLocations = locations;
+      _isLoading = false;
+    });
+  }
+
+  void _filterLocations(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        _filteredLocations = _allLocations;
+      });
+      return;
+    }
+
+    setState(() {
+      _filteredLocations = _allLocations
+          .where((loc) => loc.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      body: Stack(
-        children: [
-          GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: _center,
-              zoom: 14,
-            ),
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-            mapToolbarEnabled: true,
+      appBar: AppBar(
+        title: Text(
+          "Search Locations",
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
           ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Column(
-                children: [
-                  // Search Bar
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.search, color: Colors.black),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'All treatments',
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                        Icon(Icons.menu, color: Colors.black),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // Filter Row
-                  Row(
-                    children: [
-                      // Sort Dropdown
-                      PopupMenuButton<String>(
-                        onSelected: (value) {
-                          setState(() {
-                            _selectedSort = value;
-                            print('Selected Sort: $_selectedSort');
-                          });
-                        },
-                        itemBuilder: (context) => const [
-                          PopupMenuItem(value: 'recommended', child: Text('Recommended')),
-                          PopupMenuItem(value: 'nearest', child: Text('Nearest')),
-                          PopupMenuItem(value: 'toprated', child: Text('Top Rated')),
-                        ],
-                        offset: const Offset(0, 45),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        color: Colors.white,
-                        child: _dropdownButton(icon: Icons.tune, label: "Sort"),
-                      ),
-
-                      const SizedBox(width: 8),
-
-                      // Price Dropdown
-                      PopupMenuButton<String>(
-                        onSelected: (value) {
-                          setState(() {
-                            _selectedPrice = value;
-                            print('Selected Price: $_selectedPrice');
-                          });
-                        },
-                        itemBuilder: (context) => const [
-                          PopupMenuItem(value: 'low_to_high', child: Text('Low to High')),
-                          PopupMenuItem(value: 'high_to_low', child: Text('High to Low')),
-                        ],
-                        offset: const Offset(0, 45),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        color: Colors.white,
-                        child: _dropdownButton(icon: Icons.attach_money, label: "Price"),
-                      ),
-
-                      const SizedBox(width: 8),
-
-                      // Type Dropdown
-                      PopupMenuButton<String>(
-                        onSelected: (value) {
-                          setState(() {
-                            _selectedType = value;
-                            print('Selected Type: $_selectedType');
-                          });
-                        },
-                        itemBuilder: (context) => const [
-                          PopupMenuItem(value: 'unisex', child: Text('Unisex')),
-                          PopupMenuItem(value: 'men', child: Text('Men')),
-                          PopupMenuItem(value: 'women', child: Text('Women')),
-                        ],
-                        offset: const Offset(0, 45),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        color: Colors.white,
-                        child: _dropdownButton(icon: Icons.category, label: "Type"),
-                      ),
-                    ],
-                  )
-                ],
+        ),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // 🔍 Search Bar
+            TextField(
+              controller: _controller,
+              onChanged: _filterLocations,
+              decoration: InputDecoration(
+                hintText: "Search location...",
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: theme.colorScheme.surfaceVariant,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
-          ),
+            const SizedBox(height: 16),
 
-          // Bottom draggable list of salons
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: DraggableScrollableSheet(
-              initialChildSize: 0.35,
-              minChildSize: 0.2,
-              maxChildSize: 0.8,
-              builder: (context, scrollController) {
-                return Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  child: ListView(
-                    controller: scrollController,
-                    padding: const EdgeInsets.all(16),
-                    children: const [
-                      Center(
-                        child: SizedBox(
-                          width: 40,
-                          height: 4,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.all(Radius.circular(2)),
-                            ),
-                          ),
+            // 📋 Dropdown Suggestions
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _filteredLocations.isEmpty
+                  ? Center(
+                child: Text(
+                  "No results found",
+                  style: theme.textTheme.bodyMedium,
+                ),
+              )
+                  : ListView.separated(
+                itemCount: _filteredLocations.length,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final location = _filteredLocations[index];
+                  return ListTile(
+                    leading: const Icon(Icons.location_on_outlined),
+                    title: Text(
+                      location,
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Selected: $location"),
                         ),
-                      ),
-                      SizedBox(height: 12),
-                      Text("55 venues nearby", style: TextStyle(fontSize: 16)),
-                      SizedBox(height: 16),
-
-                      // Example salons
-                      SalonCard(
-                        title: "V-cut unisex",
-                        rating: 4.8,
-                        reviews: 613,
-                        location: "Akshayanagar, Bengaluru",
-                        image: 'assets/eeva_spa_logo.png',
-                      ),
-                      SalonCard(
-                        title: "V-cut salon",
-                        rating: 4.8,
-                        reviews: 613,
-                        location: "Hulimavu, Bengaluru",
-                        image: 'assets/eeva_spa_logo.png',
-                      ),
-                      SalonCard(
-                        title: "V-cut salon",
-                        rating: 4.8,
-                        reviews: 613,
-                        location: "HSR, Bengaluru",
-                        image: 'assets/eeva_spa_logo.png',
-                      ),
-                    ],
-                  ),
-                );
-              },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          )
-        ],
-      ),
-    );
-  }
-
-  // Reusable dropdown-style button
-  Widget _dropdownButton({required IconData icon, required String label}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 18, color: Colors.black),
-          const SizedBox(width: 6),
-          Text(label, style: const TextStyle(color: Colors.black)),
-        ],
+          ],
+        ),
       ),
     );
   }
